@@ -1,30 +1,24 @@
 import requests
-import json
 
 
 base_url = "https://maps.googleapis.com/maps/api/geocode/json?"
 
 
-# class TestGoogleMaps:
-
-def function():
+def getting_users_input():
     user_address = raw_input('Enter location: ')
     while len(user_address) <= 1 or user_address.isdigit():
         user_address = raw_input('Enter correct location: ')
+    return user_address
 
 
-    a = requests.get(base_url, params=[('address', user_address)])
-    print ('Retrieving', a.url)
-
+def return_location(user_address):
     try:
-        js = json.loads(a.content)
-    except:
-        js = None
+        response = requests.get(base_url, params=[('address', user_address)])
+        if not response.status_code == 200:
+            return "Error - Response: {}".format(response)
+        js_obj = response.json()
+        print js_obj['results'][0]['formatted_address']
+    except requests.exceptons.RequestException as e:
+        return "Error: {}".format(e)
 
-    if 'status' not in js or js['status'] != 'OK':
-        print('Failure')
-
-    print json.dumps(js, indent=4)
-    print js['results'][0]['formatted_address']
-
-
+print return_location(getting_users_input())
